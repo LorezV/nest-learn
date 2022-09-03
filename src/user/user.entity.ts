@@ -1,43 +1,28 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { CreateUserDto } from "./user.dto";
-import * as crypto from 'crypto';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { hash } from "bcrypt";
 
-@Entity({name: 'user'})
+@Entity({ name: 'user' })
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({
-    unique: true,
-    nullable: false
-  })
+  @Column()
   username: string
 
   @Column()
   email: string
 
-  @Column()
-  firstName: string
+  @Column({ default: '' })
+  bio: string
 
-  @Column()
-  lastName: string
+  @Column({default: ''})
+  image: string
 
-  @Column()
+  @Column({select: false})
   password: string
 
-  @Column()
-  passwordAlg: string
-
-  @Column()
-  passwordSalt: string
-
-  setPassword(password: string): void {
-    this.passwordSalt = crypto.randomBytes(16).toString('hex')
-    this.passwordAlg = 'sha256'
-    this.password = crypto.pbkdf2Sync(password, this.passwordSalt, 1000, 64, this.passwordAlg).toString('hex')
-  }
-
-  verifyPassword(password: string): boolean {
-    return this.password === crypto.pbkdf2Sync(password, this.passwordSalt, 1000, 64, this.passwordAlg).toString('hex')
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await hash(this.password, 10)
   }
 }

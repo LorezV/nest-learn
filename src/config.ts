@@ -1,9 +1,9 @@
 import { DataSourceOptions } from "typeorm";
-import { config } from 'dotenv'
+import * as dotenv from 'dotenv'
 
-config()
+dotenv.config()
 
-const options: DataSourceOptions = {
+export const DATA_SOURCE_OPTIONS: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT),
@@ -15,4 +15,4 @@ const options: DataSourceOptions = {
   synchronize: true
 }
 
-export default options
+export const SECRET_KEY = process.env.SECRET_KEY
